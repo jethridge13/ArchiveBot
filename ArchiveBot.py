@@ -2,6 +2,7 @@ import datetime
 import os
 import sqlite3
 import json
+from urllib.request import urlopen
 
 class ArchiveBot():
 
@@ -24,6 +25,8 @@ class ArchiveBot():
 			self.clientSecret = keys['clientSecret']
 		if keys.get('verificationToken'):
 			self.vt = keys['verificationToken']
+		if keys.get('token'):
+			self.token = keys['token']
 
 	def startDatabase(self):
 		# TODO
@@ -61,9 +64,20 @@ class ArchiveBot():
 		# TODO
 		cID = self.clientID
 
-	def sendRequest(self):
+	def test(self):
+		hook = 'auth.test'
+		return self.sendRequest(hook)
+
+	def sendRequest(self, hook):
 		# TODO
-		url = 'https://slack.com/api/'
+		# Note: urllib.urlencode() for requests
+		url = 'https://slack.com/api/' + hook
+		url += '?token=' + self.token
+		try:
+			response = urlopen(url).read()
+		except Exception as e:
+			return {'error': 'An error occurred when sending the request'}
+		return response
 
 	def loadKey(self):
 		try:
